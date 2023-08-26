@@ -1,12 +1,13 @@
 var el = null
 var vrai = null
-var conReponse=0
-var rustrue=0
-var rusfalse=0
-var numQues=1
-var numvrai=null
-if(localStorage.getItem("mieuxScS")==null){
-    localStorage.setItem("mieuxScS",0)
+var conReponse = 0
+var suppRepNum = 3
+var rustrue = 0
+var rusfalse = 0
+var numQues = 1
+var numvrai = null
+if (localStorage.getItem("mieuxScS") == null) {
+    localStorage.setItem("mieuxScS", 0)
 }
 var xml = new XMLHttpRequest
 var imgFlag = document.querySelector("#flag")
@@ -20,8 +21,8 @@ function remplFun(data, tabledeja, choise, choise2) {
         flag.src = ruslta.flags.png
         tabledeja.push(numcol)
         choise.push(numcol)
-        numvrai=numcol
-        namePays.innerHTML=data[numcol].name.common
+        numvrai = numcol
+        namePays.innerHTML = data[numcol].name.common
         vrai = data[numcol].capital.join()
         console.log(vrai);
         choise.push(parseInt(numcol) + parseInt((Math.random() * data.length).toFixed(0)) - parseInt(numcol))
@@ -68,14 +69,42 @@ function remplFun(data, tabledeja, choise, choise2) {
 
         }
     })
-    document.querySelector("#numQues").innerHTML=`numéro de question :${numQues} `
-    document.querySelector("#rustrue").innerHTML=`réponses correctes :${rustrue} `
-    document.querySelector("#rusfalse").innerHTML=`mauvaises réponses :${rusfalse} `
-    document.querySelector("#conReponse").innerHTML=`Bonnes réponses consécutives :${conReponse} ( meilleur résultat pour vous :${localStorage.getItem('mieuxScS')})`
+    document.querySelector("#numQues").innerHTML = `numéro de question :${numQues} `
+    document.querySelector("#rustrue").innerHTML = `réponses correctes :${rustrue} `
+    document.querySelector("#rusfalse").innerHTML = `mauvaises réponses :${rusfalse} `
+    document.querySelector("#conReponse").innerHTML = `Bonnes réponses consécutives :${conReponse} ( meilleur résultat pour vous :${localStorage.getItem('mieuxScS')})`
+    suppRep.innerHTML = `Supprimer une réponse <span style="font-weight: bolder;">${suppRepNum}</span>
+    `
+    suppRep.onclick= function () {
+        if (suppRepNum > 0) {
+            var numDis=0
+            let ns = (Math.random() * 2).toFixed(0);
+            for(let i=0;i<3;i++){
+                if(pays[i].innerHTML == vrai){
+                    var nv=i
+                }
+                if(pays[i].style.display=="none"){
+                    numDis++
+                }
+            }
+            console.log(numDis);
+            if(numDis==1){
+                suppRep.style.display="none"
+            }
+            while (nv==ns || pays[ns].style.display =="none") {
+                 ns = (Math.random() * 2).toFixed(0);
+            }
+            pays[ns].style.display = "none"
+            suppRepNum -= 1
+            suppRep.innerHTML = `Supprimer une réponse <span style="font-weight: bolder;">${suppRepNum}</span>`
+
+        }
+    }
 }
 xml.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-        document.querySelector("#reload").onclick=function(){
+        var suppRep = document.querySelector("#suppRep")
+        document.querySelector("#reload").onclick = function () {
             location.reload()
         }
         var data = JSON.parse(this.responseText);
@@ -84,8 +113,8 @@ xml.onreadystatechange = function () {
         var choise = []
         var choise2 = []
 
+        document.body.onload = remplFun(data, dejaf, choise, choise2)
         var validebtn = document.querySelector("#validebtn")
-        document.body.onload=remplFun(data, dejaf, choise, choise2)
         validebtn.addEventListener("click", function () {
 
 
@@ -93,22 +122,23 @@ xml.onreadystatechange = function () {
                 dropPlace.classList.add("vide")
             }
             else {
-                var details=document.createElement('button')
-                details.setAttribute('id','detail')
-                details.setAttribute('class','mb-2 btn btn-success ')
-                details.innerText="Details"
+                suppRep.style.display = "none"
+                var details = document.createElement('button')
+                details.setAttribute('id', 'detail')
+                details.setAttribute('class', 'mb-2 btn btn-success ')
+                details.innerText = "Details"
                 let aff = document.createElement("div")
-                aff.setAttribute('class','divdetails ')
-                
+                aff.setAttribute('class', 'divdetails ')
+
                 aff.id = "aff";
-    
-                  details.addEventListener("click",function(){
+
+                details.addEventListener("click", function () {
                     let currencies = []
                     for (let i in data[numvrai].currencies)
-                        currencies.push( data[numvrai].currencies[i].name)
+                        currencies.push(data[numvrai].currencies[i].name)
                     let languages = []
-                    for (let i in  data[numvrai].languages)
-                        languages.push( data[numvrai].languages[i])
+                    for (let i in data[numvrai].languages)
+                        languages.push(data[numvrai].languages[i])
                     aff.innerHTML = `
       
             <img src="${data[numvrai].flags.png}" style="border:1px solid black" alt="${data[numvrai].flags.alt}">
@@ -213,15 +243,15 @@ xml.onreadystatechange = function () {
                     `
                     aff.classList.toggle('divdetails')
                     document.querySelector(".container").append(aff)
-                
-            
-                  })  
-                        
-                  
-                  
-                
+
+
+                })
+
+
+
+
                 document.querySelector(".container").append(details)
-                this.style.display="none"
+                this.style.display = "none"
                 dropPlace.classList.remove("vide")
                 var btnsuivts = document.querySelectorAll("#btnsuivt")
                 btnsuivts.forEach(element => {
@@ -237,31 +267,36 @@ xml.onreadystatechange = function () {
                 btnsuivt.id = "btnsuivt"
                 btnsuivt.addEventListener("click", function () {
                     console.log(dejaf);
-                    choise=[]
-                    choise2=[]
-                    document.querySelectorAll("#detail").forEach(e=>{
+                    choise = []
+                    choise2 = []
+                    document.querySelectorAll("#detail").forEach(e => {
                         e.remove()
                     })
-                    document.querySelectorAll("#aff").forEach(e=>{
+                    document.querySelectorAll("#aff").forEach(e => {
                         e.remove()
                     })
+                    suppRep.style.display = "block"
+                    for (let i = 0; i < pays.length; i++) {
+                        pays[i].style.display = "block"
+                    }
+
 
                     remplFun(data, dejaf, choise, choise2)
                     document.querySelector("#conPays").append(document.querySelector("#dropPlace .pays"))
                     this.remove()
-                    validebtn.style.display="block"
+                    validebtn.style.display = "block"
                     for (let i = 0; i < pays.length; i++) {
                         pays[i].draggable = 1
                     }
-                    document.querySelectorAll(".false,.vrai").forEach(e=>{
+                    document.querySelectorAll(".false,.vrai").forEach(e => {
                         e.classList.remove("false")
                         e.classList.remove("vrai")
                     })
-                    
+
                 })
-                
+
                 var ch = dropPlace.children[0].innerHTML
-                
+
                 validebtn.after(btnsuivt)
                 if (ch == vrai) {
                     dropPlace.classList.add("vrai")
@@ -269,15 +304,17 @@ xml.onreadystatechange = function () {
                     rustrue++
                     conReponse++
                     numQues++
-                    
+                    if (conReponse % 10 == 0) {
+                        suppRepNum++
+                    }
                 }
                 else {
                     dropPlace.classList.remove("vrai")
                     dropPlace.classList.add("false")
-                    if(conReponse>localStorage.getItem("mieuxScS")){
-                        localStorage.setItem("mieuxScS",conReponse)
+                    if (conReponse > localStorage.getItem("mieuxScS")) {
+                        localStorage.setItem("mieuxScS", conReponse)
                     }
-                    conReponse=0
+                    conReponse = 0
                     numQues++
                     rusfalse++
                     for (let i = 0; i < pays.length; i++) {
@@ -291,6 +328,7 @@ xml.onreadystatechange = function () {
 
             }
         })
+        
     }
 }
 

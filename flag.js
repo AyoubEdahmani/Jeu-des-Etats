@@ -2,6 +2,7 @@ var el = null
 var vrai = null
 var conReponse=0
 var rustrue=0
+var suppRepNum = 3
 var rusfalse=0
 var numQues=1
 var numvrai=null
@@ -69,7 +70,36 @@ function remplFun(data, tabledeja, choise, choise2) {
     document.querySelector("#numQues").innerHTML=`numéro de question :${numQues} `
     document.querySelector("#rustrue").innerHTML=`réponses correctes :${rustrue} `
     document.querySelector("#rusfalse").innerHTML=`mauvaises réponses :${rusfalse} `
-    document.querySelector("#conReponse").innerHTML=`Bonnes réponses consécutives :${conReponse} ( meilleur résultat pour vous :${localStorage.getItem('mieuxScF')}) `
+    document.querySelector("#conReponse").innerHTML=`Bonnes réponses consécutives :${conReponse} ( meilleur résultat pour vous :${localStorage.getItem('mieuxScF')})` 
+    suppRep.innerHTML =` Supprimer une réponse <span style="font-weight: bolder;">${suppRepNum}</span>
+    
+    `
+    suppRep.onclick= function () {
+        if (suppRepNum > 0) {
+            var numDis=0
+            let ns = (Math.random() * 2).toFixed(0);
+            for(let i=0;i<3;i++){
+                if(pays[i].innerHTML == vrai){
+                    var nv=i
+                }
+                if(pays[i].style.display=="none"){
+                    numDis++
+                }
+            }
+            console.log(numDis);
+            if(numDis==1){
+                suppRep.style.display="none"
+            }
+            while (nv==ns || pays[ns].style.display =="none") {
+                 ns = (Math.random() * 2).toFixed(0);
+            }
+            console.log(ns);
+            pays[ns].style.display = "none"
+            suppRepNum -= 1
+            suppRep.innerHTML = `Supprimer une réponse <span style="font-weight: bolder;">${suppRepNum}</span>`
+
+        }
+    }
 }
 xml.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
@@ -91,6 +121,8 @@ xml.onreadystatechange = function () {
                 dropPlace.classList.add("vide")
             }
             else {
+                suppRep.style.display = "none"
+
                 var details=document.createElement('button')
                 details.setAttribute('id','detail')
                 details.setAttribute('class','mb-2 btn btn-success ')
@@ -243,6 +275,10 @@ xml.onreadystatechange = function () {
                     document.querySelectorAll("#aff").forEach(e=>{
                         e.remove()
                     })
+                    suppRep.style.display = "block"
+                    for (let i = 0; i < pays.length; i++) {
+                        pays[i].style.display = "block"
+                    }
 
                     remplFun(data, dejaf, choise, choise2)
                     document.querySelector("#conPays").append(document.querySelector("#dropPlace .pays"))
@@ -267,7 +303,9 @@ xml.onreadystatechange = function () {
                     rustrue++
                     conReponse++
                     numQues++
-                    
+                    if (conReponse % 10 == 0) {
+                        suppRepNum++
+                    }
                 }
                 else {
                     dropPlace.classList.remove("vrai")
